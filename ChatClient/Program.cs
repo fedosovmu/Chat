@@ -18,8 +18,8 @@ namespace ChatClient
 			Application.SetCompatibleTextRenderingDefault(false);
 
             var client = new ChatClient();
+            var clientForm = new ClientForm(client);
 
-            var clientForm = new ClientForm();
             Application.Run(clientForm);
 		}
 	}
