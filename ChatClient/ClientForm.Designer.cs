@@ -81,6 +81,7 @@
             this.MessagesBox.FormattingEnabled = true;
             this.MessagesBox.Location = new System.Drawing.Point(12, 15);
             this.MessagesBox.Name = "MessagesBox";
+            this.MessagesBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
             this.MessagesBox.Size = new System.Drawing.Size(377, 472);
             this.MessagesBox.TabIndex = 7;
             // 
@@ -89,6 +90,7 @@
             this.UsersBox.FormattingEnabled = true;
             this.UsersBox.Location = new System.Drawing.Point(395, 119);
             this.UsersBox.Name = "UsersBox";
+            this.UsersBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
             this.UsersBox.Size = new System.Drawing.Size(191, 368);
             this.UsersBox.TabIndex = 8;
             // 
@@ -138,7 +140,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "ClientForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "ClientForm";
+            this.Text = "Chat Client";
             this.ResumeLayout(false);
             this.PerformLayout();
 

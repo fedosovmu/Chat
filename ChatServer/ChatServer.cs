@@ -12,8 +12,6 @@ namespace ChatServer
         {
             Console.WriteLine("Сервер запущенн");
 
-
-
         }
     }
 }
