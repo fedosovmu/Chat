@@ -16,6 +16,13 @@ namespace ChatServer
 
 
 
+        public ChatServer ()
+        {
+            Connections = new List<Connection>();
+        }
+
+
+
         public void Listen()
         {
             var tcpListener = new TcpListener(IPAddress.Any, DefaultPort);
@@ -24,22 +31,8 @@ namespace ChatServer
 
             TcpClient tcpClient = tcpListener.AcceptTcpClient();
             var connection = new Connection(tcpClient, this);
-            Thread connectionThread = new Thread(new ThreadStart(connection.));
-            connectionThread.Start();
-        }
-
-
-
-        public void AddConnection(Connection connection)
-        {
-            Connections.Add(connection);
-        }
-
-
-
-        protected void RemoveConnection(Connection connection)
-        {
-            Connections.Remove(connection);
+            Thread connectionThread = new Thread(new ThreadStart(connection.Process));
+            connectionThread.Start();          
         }
 
 
@@ -49,11 +42,8 @@ namespace ChatServer
             byte[] data = Encoding.Unicode.GetBytes(message);
             Parallel.For(0, Connections.Count, i =>
             {
-                //Connections[i].Stream.Write(data, 0, data.Length);
-            });
-            
-
-            }
+                Connections[i].Stream.Write(data, 0, data.Length);
+            });                   
         }
     }
 }

@@ -27,6 +27,9 @@ namespace ChatServer
             Stream = _tcpClient.GetStream();
             var message = GetMessage();
 
+            _chatServer.BroadcastMessage(message);
+
+            _chatServer.Connections.Add(this);
         }
 
 

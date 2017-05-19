@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -12,11 +13,11 @@ namespace ChatClient
 {
     public partial class ClientForm : Form
     {
-        private ChatClient chatClient;
+        private ChatClient _chatClient;
 
         public ClientForm(ChatClient chatClient)
         {
-            this.chatClient = chatClient;
+            this._chatClient = chatClient;
             InitializeComponent();
             InitializeData();
             InitializeEvents();
@@ -42,10 +43,10 @@ namespace ChatClient
         {
             this.ConnectButton.Click += (object sender, EventArgs e) =>
             {
-                chatClient.Connect(NameBox.Text, IpBox.Text, Convert.ToInt32(PortBox.Text)); // <---- Connecting this
+                _chatClient.Connect(NameBox.Text, IpBox.Text, Convert.ToInt32(PortBox.Text)); // <---- Connecting this
             };
 
-            chatClient.Connected += (endPoint) =>
+            _chatClient.Connected += (endPoint) =>
             {
                 MessagesBox.Items.Add("Connected to " + endPoint);
                 ConnectButton.Visible = false;
@@ -54,19 +55,31 @@ namespace ChatClient
                 PortBox.Enabled = false;
                 NameBox.Enabled = false;
                 SendMessageButton.Enabled = true;
+
+                Thread receiveThread = new Thread(new ThreadStart(_chatClient.ReceiveMessage));
+                receiveThread.Start();
+
+                _chatClient.SendMessage("connect#" + NameBox.Text);
             };
 
-            chatClient.ConnectedError += (endPoint) =>
+            _chatClient.ConnectedError += (endPoint) =>
             {
                 MessagesBox.Items.Add("Unsuccessful connection to " + endPoint);
+                DisconnectButton.Visible = false;
+                ConnectButton.Visible = true;
+                NameBox.Enabled = true;
+                IpBox.Enabled = true;
+                PortBox.Enabled = true;
+                SendMessageButton.Enabled = false;
             };
 
             this.DisconnectButton.Click += (sender, e) =>
             {
-                chatClient.Disconnect(); // <---- Disconnecting this
+                _chatClient.SendMessage("disconnect#" + NameBox.Text);
+                _chatClient.Disconnect(); // <---- Disconnecting this
             };
 
-            chatClient.Disconnected += () =>
+            _chatClient.Disconnected += () =>
             {
                 MessagesBox.Items.Add("Disconnected.");
                 DisconnectButton.Visible = false;
@@ -78,22 +91,23 @@ namespace ChatClient
             };
 
             this.SendMessageButton.Click += (sender, e) =>
-            {          
-                chatClient.SendMessage(NameBox.Text + ": " + SendMessageBox.Text); // <---- Send message (1/2)
+            {
+                 MessagesBox.Items.Add("You:" + SendMessageBox.Text);
+                _chatClient.SendMessage("say#" + NameBox.Text + ":" + SendMessageBox.Text); // <---- Send message (1/2)
             };
 
             this.SendMessageBox.KeyDown += (object sender, KeyEventArgs e) =>
             {
                 if (e.KeyCode == Keys.Enter)
                 {
-                    e.SuppressKeyPress = true;                   
-                    chatClient.SendMessage(NameBox.Text + ": " + SendMessageBox.Text); // <---- Send message (2/2)   
+                    e.SuppressKeyPress = true;
+                    MessagesBox.Items.Add("You:" + SendMessageBox.Text);
+                    _chatClient.SendMessage("say#" + NameBox.Text + "#" + SendMessageBox.Text); // <---- Send message (1/2)  
                 }
             };
 
-            chatClient.MessageReceived += (text) =>
+            _chatClient.MessageSended += () =>
             {
-                MessagesBox.Items.Add(text);
                 SendMessageBox.Text = "";
                 SendMessageBox.Select();
             };
