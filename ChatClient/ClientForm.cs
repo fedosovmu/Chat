@@ -42,7 +42,7 @@ namespace ChatClient
         {
             this.ConnectButton.Click += (object sender, EventArgs e) =>
             {
-                chatClient.Connect(IpBox.Text, Convert.ToInt32(PortBox.Text)); // <---- Connecting this
+                chatClient.Connect(NameBox.Text, IpBox.Text, Convert.ToInt32(PortBox.Text)); // <---- Connecting this
             };
 
             chatClient.Connected += (endPoint) =>

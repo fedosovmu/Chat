@@ -12,27 +12,48 @@ namespace ChatServer
     class ChatServer
     {
         public static readonly int DefaultPort = 703;
+        public List<Connection> Connections;
 
-        public ChatServer()
-        {         
 
-        }
 
         public void Listen()
         {
-            var tcpListener = new TcpListener(IPAddress.Any, 8888);
+            var tcpListener = new TcpListener(IPAddress.Any, DefaultPort);
             tcpListener.Start();
             Console.WriteLine("Server is started. Listening...");
 
             TcpClient tcpClient = tcpListener.AcceptTcpClient();
-            //var connectedClient = new ConnectedClient(tcpClient, this);
-            //Thread clientThread = new Thread(new ThreadStart(connectedClient.Process));
-            //clientThread.Start();
+            var connection = new Connection(tcpClient, this);
+            Thread connectionThread = new Thread(new ThreadStart(connection.));
+            connectionThread.Start();
         }
 
-        public void BroadcastMessage(string message, string id)
-        {
 
+
+        public void AddConnection(Connection connection)
+        {
+            Connections.Add(connection);
+        }
+
+
+
+        protected void RemoveConnection(Connection connection)
+        {
+            Connections.Remove(connection);
+        }
+
+
+
+        public void BroadcastMessage(String message)
+        {
+            byte[] data = Encoding.Unicode.GetBytes(message);
+            Parallel.For(0, Connections.Count, i =>
+            {
+                //Connections[i].Stream.Write(data, 0, data.Length);
+            });
+            
+
+            }
         }
     }
 }

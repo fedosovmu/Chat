@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,40 +11,48 @@ namespace ChatClient
 {
     public class ChatClient
     {
+        public static readonly int DefaultPort = 703;
         public event Action<string> Connected;
         public event Action<string> ConnectedError;
-        public event Action Disconnected;
         public event Action<string> MessageReceived;
-        private TcpClient tcpClient;
-        public static readonly int DefaultPort = 703;
+        public event Action Disconnected;
 
+        public NetworkStream Stream;
+        public String Name;
+        private TcpClient _tcpClient;
 
         public ChatClient()
         {
-            tcpClient = new TcpClient();
+            _tcpClient = new TcpClient();
         }
 
-        public void Connect(String ip, int port)
+
+
+        public void Connect(String name, String ip, int port)
         {
-            try
-            {
-                tcpClient.Connect(ip, port);
-                Connected(ip + ":" + port);
-            }
-            catch (SocketException)
-            {
-                ConnectedError(ip + ":" + port + " ");
-            }
+            
         }
+
+
 
         public void Disconnect()
         {
-            Disconnected();
+            
         }
 
-        public void SendMessage(String text)
+
+
+        public void SendMessage(String message)
         {
-            MessageReceived(text);
+            byte[] data = Encoding.Unicode.GetBytes(message);
+            Stream.Write(data, 0, data.Length);
+        }
+
+
+
+        public void ReceiveMessage()
+        {
+
         }
     }
 }
